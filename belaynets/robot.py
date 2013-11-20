@@ -1,7 +1,8 @@
 import rg
 import random
 
-move_intents = []
+move_intents = set()
+current_turn = None
     
 class Robot:
     
@@ -11,6 +12,11 @@ class Robot:
         # avoid bots moving into each other
         global move_intents
         # print "intents", move_intents
+        
+        global current_turn
+        if current_turn is None or current_turn != int(game.get('turn')):
+            move_intents = set()
+            current_turn = int(game.get('turn'))
         
         # print "bot at", self.location
         
@@ -23,12 +29,13 @@ class Robot:
                     # print "attack", loc
                     return ['attack', loc]
             else:
-                if 'spawn' in rg.loc_types(loc) and rg.dist(loc, self.location) <= 2:
+                if 'spawn' in rg.loc_types(loc) and rg.dist(loc, self.location) <= 3:
                     spawn_move = True
         
         if spawn_move:
             # get possible move locations
-            move_locs = rg.locs_around(self.location, filter_out=('invalid', 'obstacle'))
+            move_locs = set(rg.locs_around(self.location, filter_out=('invalid', 'obstacle')))
+            move_locs -= move_intents
             
             for loc, bot in game.get('robots').items():
                 if loc in move_locs:
@@ -38,9 +45,9 @@ class Robot:
             move = rg.toward(self.location, rg.CENTER_POINT)
             # print "default", move, "out of", move_locs
             if move not in move_locs and len(move_locs) > 0:
-                move = random.choice(move_locs)
+                move = random.choice(list(move_locs))
             # print "move", move
-            move_intents.append(move)
+            move_intents.add(move)
             return ['move', move]
             
         return ['guard']
