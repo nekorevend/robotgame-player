@@ -29,7 +29,7 @@ class Robot:
                     # print "attack", loc
                     return ['attack', loc]
             else:
-                if 'spawn' in rg.loc_types(loc) and rg.dist(loc, self.location) <= 3:
+                if 'spawn' in rg.loc_types(loc) and rg.dist(loc, self.location) <= 2:
                     spawn_move = True
         
         if spawn_move:
